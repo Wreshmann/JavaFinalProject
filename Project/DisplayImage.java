@@ -7,16 +7,24 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.imageio.ImageIO;
 
 public class DisplayImage extends Canvas {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private BufferedImage img;
+	private BufferedImage imgResized;
 	private BufferedImage defaultImage;
-	private int[] planetCors; //tbd.. may not actually use it
 	private boolean drawBackground;
 	private Dimension size;
 	private int buffer;
+	private int w;
+	private int h;
 
 	
 	DisplayImage(){
@@ -38,20 +46,21 @@ public class DisplayImage extends Canvas {
 		Graphics2D g = (Graphics2D) gp;
 		if(drawBackground) {
 			g.drawImage(defaultImage,null,0,0);
-			size = new Dimension(
-					defaultImage.getWidth()+buffer, defaultImage.getHeight());
+			w = defaultImage.getWidth();
+			h = defaultImage.getHeight();
 		}
 		else {
 			if(img != null) {
 				g.drawImage(img,null,0,0);
-				size = new Dimension(img.getWidth()+buffer, img.getHeight());
+				w = img.getWidth();
+				h = img.getHeight();
 			}
 		}
 	}
 	
 	
-	public Object getImageInfo() {
-		return null; //should return any relative info about it
+	public BufferedImage getImage() {
+		return img; 
 	}
 	
 	
@@ -66,14 +75,15 @@ public class DisplayImage extends Canvas {
 		paint(g);
 	}
 	
-	
-	public Dimension getSize() {
-		return size;
-		
+	public int getWidth() {
+		return w;
 	}
 	
-	public void addBuffer(int b) {
-		buffer = b;
+	public int getHeight() {
+		return h;
 	}
 	
+//	private aspectRatio() {
+//		
+//	}
 }

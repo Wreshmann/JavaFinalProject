@@ -1,137 +1,56 @@
-package image;
+package Project;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import gui.DisplayImage;
 
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.stream.Stream;
+
+import javax.imageio.ImageIO;
 
 public class Queries{
-	static String searchUrl =  "https://images-api.nasa.gov/search?q={";//Need to add closing bracket in methods
-	static String imageAndYear = "&page=1&media=image&yearStart=1969&yearEnd=2019";
-	static BufferedReader reader;
-	static String line;
-	static StringBuffer responseContent = new StringBuffer();
+	private static String searchUrl =  "https://images-api.nasa.gov/search?keywords={";
+	private static String imageAndYear = "&page=1&media_type=image&year_start=1969&year_end=2019";
+	private static String data;
+	private static ArrayList<String> imageLinks;
+	private static ArrayList<String> imageLinksInfo;
+	private static int currentIndex;
+	
+	public static void searchPlanet(String planet) {
+		String searchString = searchUrl;
+		searchString += planet+"}";
+		searchString += imageAndYear;
+		URL searchUrl;
+		try {
+			searchUrl = new URL(searchString);
+			data = getRequest(searchUrl);
+			ArrayList[] d = distillData(); //scans returned string and sorts relevant information
+			imageLinks = d[0];
+			imageLinksInfo = d[1];
+			
+		}catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+	}
 
-	Queries(){
-		getRequest(null);
-	}
-	private static void searchMercury() {
-		String mercuryString = searchUrl;
-		mercuryString = mercuryString + "Mercury}";//Example URL String being generated
-		mercuryString = mercuryString + imageAndYear;
-		URL mercuryUrl;
-		try {
-			mercuryUrl = new URL(mercuryString);//Building our URL with the string above
-			getRequest(mercuryUrl);//Calling GET request method with our built URL
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	private static void searchVenus() {
-		String venusString = searchUrl;//The above behavior is mimiced for each URL
-		venusString = venusString + "Venus}";
-		venusString = venusString + imageAndYear;
-		URL venusUrl;
-		try {
-			venusUrl = new URL(venusString);
-			getRequest(venusUrl);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	private static void searchEarth() {
-		String earthString = searchUrl;
-		earthString = earthString + "Earth}";
-		earthString = earthString + imageAndYear;
-		URL earthUrl;
-		try {
-			earthUrl = new URL(earthString);
-			getRequest(earthUrl);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	private static void searchMars() {
-		String marsString = searchUrl;
-		marsString = marsString + "Mars}";
-		marsString = marsString + imageAndYear;
-		URL marsUrl;
-		try {
-			marsUrl = new URL(marsString);
-			getRequest(marsUrl);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	private static void searchJupiter() {
-		String jupiterString = searchUrl;
-		jupiterString = jupiterString + "Jupiter}";
-		jupiterString = jupiterString + imageAndYear;
-		URL jupiterUrl;
-		try {
-			jupiterUrl = new URL(jupiterString);
-			getRequest(jupiterUrl);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	private static void searchSaturn() {
-		String saturnString = searchUrl;
-		saturnString = saturnString + "Saturn}";
-		saturnString = saturnString + imageAndYear;
-		URL saturnUrl;
-		try {
-			saturnUrl = new URL(saturnString);
-			getRequest(saturnUrl);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	private static void searchNeptune() {
-		String neptuneString = searchUrl;
-		neptuneString = neptuneString + "Neptune}";
-		neptuneString = neptuneString + imageAndYear;
-		URL neptuneUrl;
-		try {
-			neptuneUrl = new URL(neptuneString);
-			getRequest(neptuneUrl);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	private static void searchUranus() {
-		String uranusString = searchUrl;
-		uranusString = uranusString + "Uranus}";
-		uranusString = uranusString + imageAndYear;
-		URL uranusUrl;
-		try {
-			uranusUrl = new URL(uranusString);
-			getRequest(uranusUrl);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
-	}
 	private static String getRequest(URL url){
+		StringBuffer responseContent = new StringBuffer();
 		String jsonResponse = null;
 		HttpURLConnection urlconnection = null;
 		InputStream inputStream = null;
+		BufferedReader reader;
+		String line;
 		try {
 			//Request Setup
 			urlconnection = (HttpURLConnection) url.openConnection();
@@ -140,13 +59,9 @@ public class Queries{
 			urlconnection.setConnectTimeout(15000);
 			urlconnection.connect();//Connection Established
 			
-			int status = urlconnection.getResponseCode();//Getting a response code to check success
-			System.out.println(status);
-			String response = urlconnection.getResponseMessage();
-			System.out.println(response);
-			System.out.println(urlconnection.getURL());
-			String content_type = urlconnection.getContentType();
-			System.out.println(content_type);
+				int status = urlconnection.getResponseCode();//Getting a response code to check success
+				String response = urlconnection.getResponseMessage();
+				String content_type = urlconnection.getContentType();
 			
 			if (status >299) {
 				reader = new BufferedReader(new InputStreamReader(urlconnection.getErrorStream()));//Gets error message from response
@@ -163,9 +78,7 @@ public class Queries{
 				reader.close();
 			}
 			jsonResponse = responseContent.toString();
-			System.out.println(jsonResponse);
-			System.out.println(responseContent.toString());//Content is converted to string and printed
-			
+
 		} catch(IOException e) {
 			//Handle Exception
 		}
@@ -184,4 +97,108 @@ public class Queries{
 		}
 		return jsonResponse;
 	}
+	
+	
+	public static BufferedImage getImage(int i) {
+		//pulls an image from imageLinks given an index input
+		if (imageLinks.size() != 0) {
+			try {
+				return ImageIO.read(new URL(imageLinks.get(i)));
+				
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IndexOutOfBoundsException e) {
+				return null;
+			}
+		}
+		return null;
+	}
+	
+	
+	private static ArrayList[] distillData() {
+		//breaks down string into tokens containing '.jpg' 
+		//and builds an arrayList of all the links and info
+		ArrayList<String> links = new ArrayList<String>();
+		ArrayList<String> linksInfo = new ArrayList<String>();
+		Scanner scan = new Scanner(data);
+		scan.useDelimiter(",");
+		Object[] tokens = scan.tokens().toArray();
+		
+		for(Object t: tokens) {
+			
+			String token = (String) t;
+			
+			if(token.contains(".jpg")) {
+				int start = token.indexOf("https");
+				int end = token.indexOf(".jpg")+4;
+				String link = token.substring(start,end);
+				links.add(link);
+
+			}
+			
+			String s = "\"description\"";
+			if(token.contains(s)) {
+				int start = token.indexOf("\":\"");
+				s = token.substring(start+3);
+				
+				linksInfo.add(s);
+			}
+			
+		}
+		ArrayList[] returnSet = {links, linksInfo};
+		return returnSet;
+	}
+	
+	
+	public static BufferedImage getRandomImage() {
+		//selects a random index
+		if (imageLinks.size() != 0) {
+			int randomIndex = (int)(Math.random()*imageLinks.size());
+			currentIndex = randomIndex;
+			return getImage(randomIndex);
+		}
+		return null;
+	}
+	
+	
+	public static String getImageInfo() {
+
+		return imageLinksInfo.get(currentIndex);
+	}
+	
+	
+	public static Object[] nextImage() {
+		//increments the index of the array list by one
+		currentIndex++;
+		if(imageLinks.size()-currentIndex == 0) {
+			currentIndex = 0;
+		}
+		
+		Object[] returnSet = new Object[2];
+		returnSet[0] = getImage(currentIndex);
+		returnSet[1] = imageLinksInfo.get(currentIndex);
+		
+		return returnSet;
+	}
+	
+	
+	public static Object[] previousImage() {
+		//decrements the index of the array list by one
+		currentIndex--;
+		if(imageLinks.size()+currentIndex < imageLinks.size()) {
+			currentIndex = imageLinks.size()-1;
+		}
+		
+		Object[] returnSet = new Object[2];
+		returnSet[0] = getImage(currentIndex);
+		returnSet[1] = imageLinksInfo.get(currentIndex);
+		
+		return returnSet;
+	}
+	
+	
 }
