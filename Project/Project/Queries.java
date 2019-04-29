@@ -21,15 +21,40 @@ import javax.imageio.ImageIO;
 public class Queries{
 	private static String searchUrl =  "https://images-api.nasa.gov/search?keywords={";
 	private static String imageAndYear = "&page=1&media_type=image&year_start=1969&year_end=2019";
+	private static String[] yearArray = {"&page=1&media_type=image&year_start=","start","&year_end=","end"};
 	private static String data;
 	private static ArrayList<String> imageLinks;
 	private static ArrayList<String> imageLinksInfo;
 	private static int currentIndex;
 	
+	
 	public static void searchPlanet(String planet) {
 		String searchString = searchUrl;
 		searchString += planet+"}";
 		searchString += imageAndYear;
+		URL searchUrl;
+		try {
+			searchUrl = new URL(searchString);
+			data = getRequest(searchUrl);
+			ArrayList[] d = distillData(); //scans returned string and sorts relevant information
+			imageLinks = d[0];
+			imageLinksInfo = d[1];
+			
+		}catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void searchPlanet(String planet, String yearStart, String yearEnd) {
+		yearArray[1] = yearStart;
+		yearArray[3] = yearEnd;
+		String searchString = searchUrl;
+		searchString += planet+"}";
+		
+		for (int i = 0; i < yearArray.length; i++) {//Loops through Array containing the custom year URL contents
+			searchString += i;//Builds the URL with custom year data passed from parameters
+		}
+		
 		URL searchUrl;
 		try {
 			searchUrl = new URL(searchString);
