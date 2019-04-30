@@ -33,6 +33,12 @@ public class Ellipse extends java.awt.geom.Ellipse2D.Double {
 		super(x, y, w, h);
 	}
 	
+	public Ellipse(double x, double y, double w, double h, Color c, String s) {
+		super(x, y, w, h);
+		this.color = c;
+		this.planet = s;
+	}
+
 	public Color getDrawColor() {
 		return color;
 	}
@@ -45,11 +51,11 @@ public class Ellipse extends java.awt.geom.Ellipse2D.Double {
 			(int) width, (int) height, color.getRGB());
 	}
 	
-	public void setCoordinates(int x, int y, int w, int h) {
-		super.x = x;
-		super.y = y;
-		super.width = w;
-		super.height = h;
+	public void setCoordinates(double cx, double cy, double cw, double ch) {
+		super.x = cx;
+		super.y = cy;
+		super.width = cw;
+		super.height = ch;
 	}
 	
 }
